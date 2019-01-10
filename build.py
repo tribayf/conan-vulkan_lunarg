@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from conan.packager import ConanMultiPackager
+import os
+import platform
 
-from bincrafters import build_template_default
-
-def main():
-    builder = build_template_default.get_builder()
+if __name__ == "__main__":
+    builder = ConanMultiPackager()
+    os.environ['LUNARG_HUMAN'] = '1'
+    if platform.system() == 'Windows':
+        builder.add(settings={'arch': 'x86'})
+    builder.add(settings={'arch': 'x86_64'})
     builder.run()
-
-if __name__ == '__main__':
-    main()

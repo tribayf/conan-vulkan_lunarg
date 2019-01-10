@@ -1,13 +1,14 @@
 project(test_package)
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.0)
+
+set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
-file(GLOB SOURCE_FILES *.cpp)
+file(GLOB SOURCE_FILES test_package.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} CONAN_PKG::vulkan)
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+target_link_libraries(${PROJECT_NAME} CONAN_PKG::vulkan_lunarg)

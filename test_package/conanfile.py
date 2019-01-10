@@ -15,4 +15,4 @@ class VulkanTestConan(ConanFile):
     def test(self):
         if not tools.cross_building(self.settings):
             with tools.environment_append(RunEnvironment(self).vars), tools.chdir('bin'):
-                self.run(f'.{os.sep}test_package')
+                self.run(os.path.join('.', 'test_package'))

@@ -1,0 +1,26 @@
+linux: &linux
+   os: linux
+   sudo: required
+   language: python
+   python: "3.6"
+   services:
+     - docker
+osx: &osx
+   os: osx
+   language: generic
+matrix:
+   include:
+
+      - <<: *linux
+        env: CONAN_DOCKER_IMAGE=lasote/conangcc7
+
+      - <<: *osx
+        osx_image: xcode10.1
+
+install:
+  - chmod +x .travis/install.sh
+  - ./.travis/install.sh
+
+script:
+  - chmod +x .travis/run.sh
+  - ./.travis/run.sh
