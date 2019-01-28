@@ -13,6 +13,7 @@ class LunarGVulkanSDKConan(ConanFile):
     description = 'The LunarG Vulkan SDK provides the development and runtime components required to build, run, and debug Vulkan applications.'
     url = 'https://github.com/bincrafters/conan-lunarg_vulkan_sdk'
     homepage = 'https://vulkan.lunarg.com/sdk/home'
+    topics = ('conan', 'vulkan', 'vk', 'rendering', 'metal', 'moltenvk')
     author = 'bincrafters <bincrafters@gmail.com>'
     no_copy_source = True
 
