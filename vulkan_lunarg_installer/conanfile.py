@@ -7,7 +7,7 @@ import sys
 
 class LunarGVulkanSDKInstallerConan(ConanFile):
     name = "vulkan_lunarg_installer"
-    version = "1.1.97.0"
+    version = "1.1.101.0"
     description = "The LunarG Vulkan SDK provides the development and runtime components required to build, run, and debug Vulkan applications."
     url = "https://github.com/bincrafters/conan-lunarg_vulkan_sdk"
     homepage = "https://vulkan.lunarg.com/sdk/home"
