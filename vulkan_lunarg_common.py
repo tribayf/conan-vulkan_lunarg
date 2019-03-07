@@ -44,7 +44,7 @@ class VulkanLunarGCommon:
             sha256 = "5cf01379a9f2606e2cd528d78ca2d8287e3fbc32f048f911eae07c94b2763bcd"
         elif self.os == "Macos":
             filename = "vulkansdk-macos-{arch}-{version}.tar.gz".format(arch=self.arch, version=self.conanfile.version)
-            url = "https://sdk.lunarg.com/sdk/download/{}/macos/{}".format(self.conanfile.version, filename)
+            url = "https://sdk.lunarg.com/sdk/download/{}/mac/{}".format(self.conanfile.version, filename)
             sha256 = "b175849a1c609b561ef2406ced3f2e408af2970725a45f49547d03cefd5bbc39"
         else:
             raise ConanInvalidConfiguration("Unknown os: {}".format(self.os))
