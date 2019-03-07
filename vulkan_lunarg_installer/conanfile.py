@@ -16,7 +16,7 @@ class LunarGVulkanSDKInstallerConan(ConanFile):
     no_copy_source = True
 
     license = "Various"
-    exports = ["LICENSE.md"]
+    exports = ["../LICENSE.md", "../vulkan_lunarg_common.py"]
 
     settings = "os_build", "arch_build"
 
