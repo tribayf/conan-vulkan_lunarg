@@ -25,5 +25,5 @@ if __name__ == "__main__":
     for arch in archs:
         builder.add(settings={archkey_str: arch, })
 
-    with environment_append({"LUNARG_HUMAN": 1}):
+    with environment_append({"LUNARG_HUMAN": "1"}):
         builder.run()
