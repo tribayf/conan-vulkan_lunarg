@@ -1,11 +1,29 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from conan.packager import ConanMultiPackager
+from conans.errors import ConanException
+from conans.tools import get_env, environment_append
 import os
-import platform
 
 if __name__ == "__main__":
-    builder = ConanMultiPackager()
-    os.environ['LUNARG_HUMAN'] = '1'
-    if platform.system() == 'Windows':
-        builder.add(settings={'arch': 'x86'})
-    builder.add(settings={'arch': 'x86_64'})
-    builder.run()
+
+    build_vulkan_lunarg_installer = get_env("BUILD_VULKAN_LUNARG_INSTALLER", False)
+
+    subdir = "vulkan_lunarg_installer" if build_vulkan_lunarg_installer else "vulkan_lunarg"
+    builder = ConanMultiPackager(
+        cwd=os.path.join(os.path.dirname(os.path.realpath(__file__)), subdir),
+        docker_entry_script="cd {}".format(subdir),
+    )
+    archs_str = get_env("ARCH")
+    if not archs_str:
+        raise ConanException("Need ARCH environment variable")
+    archs = archs_str.split(",")
+
+    archkey_str = "arch_build" if build_vulkan_lunarg_installer else "arch"
+
+    for arch in archs:
+        builder.add(settings={archkey_str: arch, })
+
+    with environment_append({"LUNARG_HUMAN": 1}):
+        builder.run()
