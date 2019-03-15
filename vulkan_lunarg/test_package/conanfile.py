@@ -14,7 +14,7 @@ class VulkanTestConan(ConanFile):
         cmake.build()
 
     def imports(self):
-        self.copy("*.dll", dst="bin")
+        self.copy("*.dll", dst="bin", keep_path=False)
 
     def test(self):
         if not tools.cross_building(self.settings):

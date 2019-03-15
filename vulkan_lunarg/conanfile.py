@@ -49,12 +49,15 @@ class VulkanLunarGConan(ConanFile):
             if self.settings.arch == "x86":
                 lib_folder = os.path.join(base_folder, "Lib32")
                 bin_folder = os.path.join(base_folder, "Bin32")
+                runtime_folder = os.path.join(base_folder, "RunTimeInstaller", "x86")
             elif self.settings.arch == "x86_64":
                 lib_folder = os.path.join(base_folder, "Lib")
                 bin_folder = os.path.join(base_folder, "Bin")
+                runtime_folder = os.path.join(base_folder, "RunTimeInstaller", "x64")
             self.copy(pattern="*", dst="lib", src=lib_folder)
             self.copy(pattern="*.dll", dst="bin", src=bin_folder)
             self.copy(pattern="*.pdb", dst="bin", src=bin_folder)
+            self.copy(pattern="*", dst="bin", src=runtime_folder)
             self.copy(pattern="*", dst="include", src=os.path.join(base_folder, "Include"))
             self.copy(pattern="LICENSE.txt", dst="licenses", src=base_folder)
         elif self.settings.os == "Linux":

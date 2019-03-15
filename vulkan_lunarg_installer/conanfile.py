@@ -67,7 +67,7 @@ class LunarGVulkanSDKInstallerConan(ConanFile):
     def package_info(self):
         self.cpp_info.bindirs = ["bin"]
         if self.settings.os_build == "Windows":
-            self.cpp_info.bindirs.append("bin/tools")
+            self.cpp_info.bindirs.append(os.path.join("bin", "tools"))
 
         for bindir in self.cpp_info.bindirs:
             bindir_fullpath = os.path.join(self.package_folder, bindir)
