@@ -29,6 +29,10 @@ class VulkanLunarGCommon:
         else:
             return self.conanfile.settings.arch
 
+    def build_requirements(self):
+        if self.os == "Windows":
+            self.conanfile.build_requires("7z_installer/1.0@conan/stable")
+
     def configure(self):
         if self.os != "Windows" and self.arch != "x86_64":
             raise ConanInvalidConfiguration("LunarG Vulkan SDK only supports 64-bit")
@@ -73,7 +77,11 @@ class VulkanLunarGCommon:
         targetdlfn = self.fetch_data()
 
         if self.os == "Windows":
-            self.conanfile.run("\"{}\" /S".format(targetdlfn))
+            self.conanfile.run("7z x -snl -y -mmt{cpu_count} -o\"{outdir}\" \"{archive}\"".format(
+                cpu_count=tools.cpu_count(),
+                outdir="vulkansdk",
+                archive=targetdlfn,
+            ))
         else:
             tools.untargz(targetdlfn, self.conanfile.build_folder)
             if self.os == "Linux":

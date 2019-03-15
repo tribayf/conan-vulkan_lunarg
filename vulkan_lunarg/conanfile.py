@@ -35,13 +35,17 @@ class VulkanLunarGConan(ConanFile):
         self._add_common()
         self._common.configure()
 
+    def build_requirements(self):
+        self._add_common()
+        self._common.build_requirements()
+
     def build(self):
         self._add_common()
         self._common.build()
 
     def package(self):
         if self.settings.os == "Windows":
-            base_folder = "C:\\VulkanSDK\\{version}".format(version=self.version)
+            base_folder = os.path.join(self.build_folder, "vulkansdk")
             if self.settings.arch == "x86":
                 lib_folder = os.path.join(base_folder, "Lib32")
                 bin_folder = os.path.join(base_folder, "Bin32")
