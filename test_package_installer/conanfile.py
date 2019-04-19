@@ -4,7 +4,7 @@ from conans import ConanFile, tools, RunEnvironment
 
 
 class VulkanTestConan(ConanFile):
-    exports_sources = 'shader.frag'
+    exports_sources = ['shader.frag', ]
 
     def test(self):
         if not tools.cross_building(self.settings):

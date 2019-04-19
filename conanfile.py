@@ -1,47 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import os
-from conans import ConanFile
-import sys
+from vulkan_lunarg_common import VulkanLunarGBase
 
 
-class VulkanLunarGConan(ConanFile):
+class VulkanLunarGConan(VulkanLunarGBase):
     name = "vulkan_lunarg"
-    version = "1.1.101.0"
-    description = "The LunarG Vulkan SDK provides the development and runtime components required to build, run, and debug Vulkan applications."
-    url = "https://github.com/bincrafters/conan-vulkan_lunarg"
-    homepage = "https://vulkan.lunarg.com/sdk/home"
-    topics = ("conan", "vulkan", "vk", "rendering", "metal", "moltenvk")
-    author = "bincrafters <bincrafters@gmail.com>"
-    no_copy_source = True
-
-    license = "Various"
-    exports = ["../LICENSE.md", "../vulkan_lunarg_common.py"]
-
+    exports = VulkanLunarGBase.exports + ["vulkan_lunarg_common.py"]
     settings = "os", "arch"
 
     _is_installer = False
-
-    _common = None
-    def _add_common(self):
-        curdir = os.path.dirname(os.path.realpath(__file__))
-        pardir = os.path.dirname(curdir)
-        sys.path.insert(0, curdir)
-        sys.path.insert(0, pardir)
-        from vulkan_lunarg_common import VulkanLunarGCommon
-        self._common = VulkanLunarGCommon(self)
-
-    def configure(self):
-        self._add_common()
-        self._common.configure()
-
-    def build_requirements(self):
-        self._add_common()
-        self._common.build_requirements()
-
-    def build(self):
-        self._add_common()
-        self._common.build()
 
     def package(self):
         if self.settings.os == "Windows":
@@ -49,13 +17,17 @@ class VulkanLunarGConan(ConanFile):
             if self.settings.arch == "x86":
                 lib_folder = os.path.join(base_folder, "Lib32")
                 bin_folder = os.path.join(base_folder, "Bin32")
+                runtimebin_folder = os.path.join(base_folder, "RunTimeInstaller", "x86")
             elif self.settings.arch == "x86_64":
                 lib_folder = os.path.join(base_folder, "Lib")
                 bin_folder = os.path.join(base_folder, "Bin")
+                runtimebin_folder = os.path.join(base_folder, "RunTimeInstaller", "x64")
             self.copy(pattern="*", dst="lib", src=lib_folder)
             self.copy(pattern="*.dll", dst="bin", src=bin_folder)
             self.copy(pattern="*.pdb", dst="bin", src=bin_folder)
+            self.copy(pattern="*.json", dst="bin", src=bin_folder)
             self.copy(pattern="*", dst="include", src=os.path.join(base_folder, "Include"))
+            self.copy(pattern="*", dst="bin", src=runtimebin_folder)
             self.copy(pattern="LICENSE.txt", dst="licenses", src=base_folder)
         elif self.settings.os == "Linux":
             base_folder = os.path.join(self.build_folder, "vulkansdk")

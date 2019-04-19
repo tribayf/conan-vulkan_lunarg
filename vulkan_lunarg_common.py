@@ -1,90 +1,84 @@
 # -*- coding: utf-8 -*-
 
-from collections import namedtuple
-from conans import tools
+from conans import ConanFile, tools
 from conans.errors import ConanInvalidConfiguration
 from conans.tools import get_env
 import os
 import tempfile
 
 
-FetchMetadata = namedtuple("FetchMetadata", ("url", "filename", "sha256"))
+class VulkanLunarGBase(ConanFile):
+    version = "1.1.106.0"
+    description = "The LunarG Vulkan SDK provides the development and runtime components required to build, run, and debug Vulkan applications."
+    url = "https://github.com/bincrafters/conan-vulkan_lunarg"
+    homepage = "https://vulkan.lunarg.com/sdk/home"
+    topics = ("conan", "vulkan", "vk", "rendering", "metal", "moltenvk")
+    author = "bincrafters <bincrafters@gmail.com>"
+    no_copy_source = True
 
-
-class VulkanLunarGCommon:
-    def __init__(self, conanfile):
-        self.conanfile = conanfile
-
-    @property
-    def os(self):
-        if self.conanfile._is_installer:
-            return self.conanfile.settings.os_build
-        else:
-            return self.conanfile.settings.os
+    license = "Various"
+    exports = ["LICENSE.md"]
 
     @property
-    def arch(self):
-        if self.conanfile._is_installer:
-            return self.conanfile.settings.arch_build
+    def _os(self):
+        if self._is_installer:
+            return self.settings.os_build
         else:
-            return self.conanfile.settings.arch
+            return self.settings.os
+
+    @property
+    def _arch(self):
+        if self._is_installer:
+            return self.settings.arch_build
+        else:
+            return self.settings.arch
 
     def build_requirements(self):
-        if self.os == "Windows":
-            self.conanfile.build_requires("7z_installer/1.0@conan/stable")
+        if self._os == "Windows":
+            self.build_requires("7z_installer/1.0@conan/stable")
 
     def configure(self):
-        if self.os != "Windows" and self.arch != "x86_64":
-            raise ConanInvalidConfiguration("LunarG Vulkan SDK only supports 64-bit")
+        if self._os != "Windows" and self._arch != "x86_64":
+            raise ConanInvalidConfiguration("LunarG Vulkan SDK only supports 64-bit on non-Windows targets")
 
-    def get_fetch_metadata(self):
-        if self.os == "Windows":
-            filename = "VulkanSDK-{version}-Installer.exe".format(version=self.conanfile.version)
-            url = "https://sdk.lunarg.com/sdk/download/{}/windows/{}".format(self.conanfile.version, filename)
-            sha256 = "9161e719d23967592601eb385ef58ac7f4d9c18892dc8dbc1d431cb5a3957673"
-        elif self.os == "Linux":
-            filename = "vulkansdk-linux-{arch}-{version}.tar.gz".format(arch=self.arch, version=self.conanfile.version)
-            url = "https://sdk.lunarg.com/sdk/download/{}/linux/{}".format(self.conanfile.version, filename)
-            sha256 = "5cf01379a9f2606e2cd528d78ca2d8287e3fbc32f048f911eae07c94b2763bcd"
-        elif self.os == "Macos":
-            filename = "vulkansdk-macos-{arch}-{version}.tar.gz".format(arch=self.arch, version=self.conanfile.version)
-            url = "https://sdk.lunarg.com/sdk/download/{}/mac/{}".format(self.conanfile.version, filename)
-            sha256 = "b175849a1c609b561ef2406ced3f2e408af2970725a45f49547d03cefd5bbc39"
+    def build(self):
+        if self._os == "Windows":
+            filename = "VulkanSDK-{version}-Installer.exe".format(version=self.version)
+            url = "https://sdk.lunarg.com/sdk/download/{}/windows/{}".format(self.version, filename)
+            sha256 = "24b5c9d415912c0fb07f973f10f671a488b0e33ca991409bcabf1d4bebf0b804"
+        elif self._os == "Linux":
+            filename = "vulkansdk-linux-{arch}-{version}.tar.gz".format(arch=self._arch, version=self.version)
+            url = "https://sdk.lunarg.com/sdk/download/{}/linux/{}".format(self.version, filename)
+            sha256 = "78739f6418f10bc9784743ab3d297b278106663256fe8b7482edfea6c65c7ec3"
+        elif self._os == "Macos":
+            filename = "vulkansdk-macos-{arch}-{version}.tar.gz".format(arch=self._arch, version=self.version)
+            url = "https://sdk.lunarg.com/sdk/download/{}/mac/{}".format(self.version, filename)
+            sha256 = "3806e7d0550ee00c61ae5ea45e9e87babcd952f1b4705232dc420ddc3e865314"
         else:
-            raise ConanInvalidConfiguration("Unknown os: {}".format(self.os))
+            raise ConanInvalidConfiguration("Unknown os: {}".format(self._os))
 
         # override ratelimit: limit of 5 downloads per url per 24h
         if get_env("LUNARG_HUMAN", False):
             url += "?Human=true"
 
-        return FetchMetadata(url, filename, sha256)
-
-    def fetch_data(self):
-        fetch_data = self.get_fetch_metadata()
-
-        targetdlfn = os.path.join(tempfile.gettempdir(), fetch_data.filename)
+        targetdlfn = os.path.join(tempfile.gettempdir(), filename)
 
         if os.path.exists(targetdlfn) and not get_env("VULKAN_LUNARG_FORCE_DOWNLOAD", False):
-            self.conanfile.output.info("Skipping download. Using cached {}".format(targetdlfn))
+            self.output.info("Skipping download. Using cached {}".format(targetdlfn))
         else:
-            self.conanfile.output.info("Downloading {} from {}".format(fetch_data.filename, fetch_data.url))
-            tools.download(fetch_data.url, targetdlfn)
-        tools.check_sha256(targetdlfn, fetch_data.sha256)
+            self.output.info("Downloading {} from {}".format(filename, url))
+            tools.download(url, targetdlfn)
+        tools.check_sha256(targetdlfn, sha256)
 
-        return targetdlfn
-
-    def build(self):
-        targetdlfn = self.fetch_data()
-
-        if self.os == "Windows":
-            self.conanfile.run("7z x -snl -y -mmt{cpu_count} -o\"{outdir}\" \"{archive}\"".format(
+        if self._os == "Windows":
+            self.run("7z x -snl -y -mmt{cpu_count} -o\"{outdir}\" \"{archive}\"".format(
                 cpu_count=tools.cpu_count(),
                 outdir="vulkansdk",
                 archive=targetdlfn,
             ))
         else:
-            tools.untargz(targetdlfn, self.conanfile.build_folder)
-            if self.os == "Linux":
-                os.rename(self.conanfile.version, "vulkansdk")
+            tools.untargz(targetdlfn, self.build_folder)
+            if self._os == "Linux":
+                os.rename(self.version, "vulkansdk")
             else:
-                os.rename("vulkansdk-macos-{version}".format(version=self.conanfile.version), "vulkansdk")
+                os.rename("vulkansdk-macos-{}".format(self.version), "vulkansdk")
