@@ -6,6 +6,7 @@ from vulkan_lunarg_common import VulkanLunarGBase
 
 class VulkanLunarGConan(VulkanLunarGBase):
     name = "vulkan_lunarg"
+    version = "1.1.106.0"
     exports = VulkanLunarGBase.exports + ["vulkan_lunarg_common.py"]
     settings = "os", "arch"
 
@@ -13,7 +14,7 @@ class VulkanLunarGConan(VulkanLunarGBase):
 
     def package(self):
         if self.settings.os == "Windows":
-            base_folder = os.path.join(self.build_folder, "vulkansdk")
+            base_folder = os.path.join(self.build_folder, self._source_subfolder)
             if self.settings.arch == "x86":
                 lib_folder = os.path.join(base_folder, "Lib32")
                 bin_folder = os.path.join(base_folder, "Bin32")
@@ -30,7 +31,7 @@ class VulkanLunarGConan(VulkanLunarGBase):
             self.copy(pattern="*", dst="bin", src=runtimebin_folder)
             self.copy(pattern="LICENSE.txt", dst="licenses", src=base_folder)
         elif self.settings.os == "Linux":
-            base_folder = os.path.join(self.build_folder, "vulkansdk")
+            base_folder = os.path.join(self.build_folder, self._source_subfolder)
             base_pkg_folder = os.path.join(base_folder, str(self.settings.arch))
             self.copy(pattern="*", dst="include", src=os.path.join(base_pkg_folder, "include"))
             self.copy(pattern="*", dst="lib", src=os.path.join(base_pkg_folder, "lib"))
@@ -38,7 +39,7 @@ class VulkanLunarGConan(VulkanLunarGBase):
             self.copy(pattern="*", dst="etc", src=os.path.join(base_pkg_folder, "etc"))
             self.copy(pattern="LICENSE.txt", dst="licenses", src=base_folder)
         elif self.settings.os == "Macos":
-            base_folder = os.path.join(self.build_folder, "vulkansdk", "macOS")
+            base_folder = os.path.join(self.build_folder, self._source_subfolder, "macOS")
             self.copy(pattern="*", dst="include", src=os.path.join(base_folder, "include"))
             self.copy(pattern="*", dst="lib", src=os.path.join(base_folder, "lib"))
             self.copy(pattern="*", dst="bin", src=os.path.join(base_folder, "bin"))

@@ -8,6 +8,7 @@ from bincrafters import build_template_default
 if __name__ == "__main__":
 
     builder = build_template_default.get_builder(pure_c=True)
+    for item in builder.items:
+        item.env_vars["LUNARG_HUMAN"] = "1"
 
-    with environment_append({"LUNARG_HUMAN": "1"}):
-        builder.run()
+    builder.run()

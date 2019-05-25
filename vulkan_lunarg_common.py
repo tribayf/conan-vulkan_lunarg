@@ -19,6 +19,8 @@ class VulkanLunarGBase(ConanFile):
     license = "Various"
     exports = ["LICENSE.md"]
 
+    _source_subfolder = "source_subfolder"
+
     @property
     def _os(self):
         if self._is_installer:
@@ -36,6 +38,25 @@ class VulkanLunarGBase(ConanFile):
     def build_requirements(self):
         if self._os == "Windows":
             self.build_requires("7z_installer/1.0@conan/stable")
+
+    def system_requirements(self):
+        self.output.warn("in system_requirements")
+        if tools.os_info.with_apt or tools.os_info.with_yum:
+            if tools.os_info.with_apt:
+                self.output.warn("apt detected")
+                packages = [
+                    "libwayland-dev",
+                    "libxrandr-dev",
+                ]
+            elif tools.os_info.with_yum:
+                self.output.warn("yum detected")
+                packages = [
+                    "wayland-devel",
+                    "libXrandr-devel",
+                ]
+            installer = tools.SystemPackageTool()
+            for package in packages:
+                installer.install(package)
 
     def configure(self):
         if self._os != "Windows" and self._arch != "x86_64":
@@ -73,12 +94,25 @@ class VulkanLunarGBase(ConanFile):
         if self._os == "Windows":
             self.run("7z x -snl -y -mmt{cpu_count} -o\"{outdir}\" \"{archive}\"".format(
                 cpu_count=tools.cpu_count(),
-                outdir="vulkansdk",
+                outdir=self._source_subfolder,
                 archive=targetdlfn,
             ))
         else:
             tools.untargz(targetdlfn, self.build_folder)
             if self._os == "Linux":
-                os.rename(self.version, "vulkansdk")
+                os.rename(self.version, self._source_subfolder)
             else:
-                os.rename("vulkansdk-macos-{}".format(self.version), "vulkansdk")
+                os.rename("vulkansdk-macos-{}".format(self.version), self._source_subfolder)
+
+        if self._os == "Linux":
+            tools.replace_in_file(os.path.join(self._source_subfolder, "build_tools.sh"),
+                                  "python2 ",
+                                  "python ")
+            tools.replace_in_file(os.path.join(self._source_subfolder, "source", "shaderc", "update_shaderc_sources.py"),
+                                  "cmp=lambda x,y: cmp(x.subdir, y.subdir)",
+                                  "key=lambda x: x.subdir")
+
+            self.run("\"{}\"".format("{}/build_tools.sh".format(self._source_subfolder)))
+            with tools.chdir(os.path.join(self._source_subfolder, "x86_64", "bin")):
+                for file in os.listdir("."):
+                    self.run("strip \"{}\"".format(file))
