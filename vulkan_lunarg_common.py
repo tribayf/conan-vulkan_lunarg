@@ -8,7 +8,7 @@ import tempfile
 
 
 class VulkanLunarGBase(ConanFile):
-    version = "1.1.106.0"
+    version = "1.1.114.0"
     description = "The LunarG Vulkan SDK provides the development and runtime components required to build, run, and debug Vulkan applications."
     url = "https://github.com/bincrafters/conan-vulkan_lunarg"
     homepage = "https://vulkan.lunarg.com/sdk/home"
@@ -45,15 +45,15 @@ class VulkanLunarGBase(ConanFile):
         if self._os == "Windows":
             filename = "VulkanSDK-{version}-Installer.exe".format(version=self.version)
             url = "https://sdk.lunarg.com/sdk/download/{}/windows/{}".format(self.version, filename)
-            sha256 = "24b5c9d415912c0fb07f973f10f671a488b0e33ca991409bcabf1d4bebf0b804"
+            sha256 = "6233e3095b67b883a55b4fa61fd0376feecb1de1e0a7b3962fa7a85cdd0e663f"
         elif self._os == "Linux":
             filename = "vulkansdk-linux-{arch}-{version}.tar.gz".format(arch=self._arch, version=self.version)
             url = "https://sdk.lunarg.com/sdk/download/{}/linux/{}".format(self.version, filename)
-            sha256 = "78739f6418f10bc9784743ab3d297b278106663256fe8b7482edfea6c65c7ec3"
+            sha256 = "796d3eedea9d2f5fd0720e5ebd9cc6072c95d5e958abea6d07b121db3973e968"
         elif self._os == "Macos":
             filename = "vulkansdk-macos-{arch}-{version}.tar.gz".format(arch=self._arch, version=self.version)
             url = "https://sdk.lunarg.com/sdk/download/{}/mac/{}".format(self.version, filename)
-            sha256 = "3806e7d0550ee00c61ae5ea45e9e87babcd952f1b4705232dc420ddc3e865314"
+            sha256 = "db5df93d10b7f689daad9a455baa4eeacb36826edc8270b45585559a4fbb5569"
         else:
             raise ConanInvalidConfiguration("Unknown os: {}".format(self._os))
 
